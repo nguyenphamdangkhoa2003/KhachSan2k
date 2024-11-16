@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Date;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -22,8 +23,11 @@ class SocialAuthController extends Controller
             ]
             ,
             [
-                'name' => $socialUser->getName() ?? 'unknown',
+                'name' => $socialUser->getName() ?? $socialUser->getNickname(),
                 'email' => $socialUser->getEmail(),
+                "phonenumber" => "unknow",
+                "dob" => Date::now(),
+                "avatar" => $socialUser->getAvatar(),
                 'email_verified_at' => now(),
                 'password' => null,
             ]
@@ -32,6 +36,6 @@ class SocialAuthController extends Controller
         if ($user->markEmailAsVerified()) {
             event(new Verified($user));
         }
-        return redirect(route('dashboard'));
+        return redirect()->intended(route("home"));
     }
 }

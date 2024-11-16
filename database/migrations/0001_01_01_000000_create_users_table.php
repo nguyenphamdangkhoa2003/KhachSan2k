@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Address;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +14,10 @@ return new class extends Migration {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string("avatar")->default("https://res.cloudinary.com/dff6pkxpt/image/upload/v1731163431/9334243_ypl50f.jpg");
             $table->string('email')->unique();
+            $table->string("phonenumber");
+            $table->date("dob");
             $table->timestamp('email_verified_at')->nullable();
             $table->boolean('is_admin')->default(false);
             $table->string('password')->nullable();

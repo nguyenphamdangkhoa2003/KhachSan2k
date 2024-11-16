@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Middleware\admin;
-use App\Livewire\Admin\Dashboard;
+use App\Livewire\Pages\Admin\Component\CreateUser;
+use App\Livewire\Pages\Admin\Component\RoomTable;
+use App\Livewire\Pages\Admin\Component\RoomTypeTable;
+use App\Livewire\Pages\Admin\Component\UserTable;
+use App\Livewire\Pages\Admin\Dashboard;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -38,8 +41,17 @@ Route::middleware('auth')->group(function () {
 
     Volt::route('confirm-password', 'pages.auth.confirm-password')
         ->name('password.confirm');
+
+    Route::get("logout", function () {
+        Auth::logout();
+        return redirect(route("home"));
+    })->name("logout");
 });
 
 Route::middleware(['auth', admin::class])->group(function () {
-    Route::get('admin/dashboard', Dashboard::class)->name('admin.dashboard');
+    Volt::route('admin/dashboard', Dashboard::class)->name('admin.dashboard');
+    Volt::route('admin/dashboard/list-type-room', RoomTypeTable::class)->name('admin.dashboard.typeroom');
+    Volt::route("admin/dashboard/list-room", RoomTable::class)->name("admin.dashboard.room");
+    Volt::route("admin/dashboard/list-user", UserTable::class)->name("admin.dashboard.user");
+    Volt::route("admin/dashboard/user/create", CreateUser::class)->name("admin.dashboard.user.create");
 });

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Livewire\Attributes\Layout;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -20,7 +21,11 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        "address",
+        "phonenumber",
+        "dob",
         'password',
+        'avatar',
     ];
 
     /**

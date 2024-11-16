@@ -22,6 +22,6 @@ class admin
         }
 
         // Nếu không, chuyển hướng đến trang khác (ví dụ: trang chủ hoặc thông báo lỗi)
-        return redirect('welcome')->with('error', 'Bạn không có quyền truy cập trang này.');
+        return redirect(route('home'))->with('error', 'Bạn không có quyền truy cập trang này.');
     }
 }

@@ -17,23 +17,49 @@
 </head>
 
 <body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-        <livewire:layout.navigation />
 
-        <!-- Page Heading -->
-        @if (isset($header))
-            <header class="bg-white dark:bg-gray-800 shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    {{ $header }}
-                </div>
-            </header>
-        @endif
+    {{-- The navbar with `sticky` and `full-width` --}}
+    <x-mary-nav sticky full-width>
 
-        <!-- Page Content -->
-        <main>
+        <x-slot:brand>
+            {{-- Drawer toggle for "main-drawer" --}}
+            <label for="main-drawer" class="lg:hidden mr-3">
+                <x-mary-icon name="o-bars-3" class="cursor-pointer" />
+            </label>
+
+            {{-- Brand --}}
+            <div>App</div>
+        </x-slot:brand>
+
+        {{-- Right side actions --}}
+        <x-slot:actions>
+            <x-mary-theme-toggle darkTheme="retro" lightTheme="cupcake" />
+            @auth
+                <x-mary-dropdown label="{{ Auth::user()->name }}">
+                    <x-mary-menu-item title="Profile" icon="o-user-circle" link="{{ route('profile') }}" />
+                    @if (Auth::user()->is_admin)
+                    <x-mary-menu-item title="Dashboard" icon="o-chart-bar" link="{{ route('admin.dashboard') }}" />
+                    @endif('admin')
+                       
+                    <x-mary-menu-item title="Log out" icon="c-power" link="{{ route('logout') }}" />
+
+                </x-mary-dropdown>
+            @else
+                <x-mary-button label="Login" link="{{ route('login') }}" class="btn-ghost btn-sm" responsive />
+                <x-mary-button label="Register" link="{{ route('register') }}" class="btn-ghost btn-sm" responsive />
+            @endauth
+        </x-slot:actions>
+    </x-mary-nav>
+
+    {{-- The main content with `full-width` --}}
+    <x-mary-main with-nav full-width>
+
+        <x-slot:content>
             {{ $slot }}
-        </main>
-    </div>
+        </x-slot:content>
+    </x-mary-main>
+
+    <x-mary-toast />
 </body>
 <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
 
