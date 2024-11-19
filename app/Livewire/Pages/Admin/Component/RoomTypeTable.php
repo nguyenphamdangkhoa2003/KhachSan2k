@@ -4,9 +4,13 @@ namespace App\Livewire\Pages\Admin\Component;
 
 use App\Livewire\Forms\RoomTypeForm;
 use App\Models\RoomType;
+use App\Models\TypeRoomImage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Rule;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Mary\Traits\Toast;
 use PhpParser\Node\Stmt\TryCatch;
@@ -14,17 +18,22 @@ class RoomTypeTable extends Component
 {
     use Toast;
     use WithPagination;
+    use WithFileUploads;
     public $perPage = 5;
     public $isEditing = false;
     public $isShowActionModal = false;
     public $isShowConfirmModal = false;
     public $iShowFilterDrawer = false;
+    public $photosUploaded = false;
     public $id;
     #[Url(as: 'q')]
     public $search = "";
     public RoomTypeForm $roomTypeForm;
     public array $sortBy = ['column' => 'name', 'direction' => 'asc'];
-    
+    #[Rule(['photos' => 'required'])]          // A separated rule to make it required
+    #[Rule(['photos.*' => 'image|max:1024'])]
+    public array $photos = [];
+    public array $photosDisplay = [];
     #[Layout('components.layouts.admin')]
     public function render()
     {
@@ -70,7 +79,14 @@ class RoomTypeTable extends Component
     }
     public function delete()
     {
+
+
         try {
+            $room_type = RoomType::find($this->id);
+            $type_room_images = $room_type->TypeRoomImages;
+            foreach ($type_room_images as $type_room_image) {
+                Cloudinary::destroy($type_room_image->public_image_id);
+            }
             RoomType::destroy($this->id);
             $this->isShowConfirmModal = false;
             $this->success("Delete Successfully!", "The room type was deleted successfully", "toast-top toast-center");
@@ -81,7 +97,16 @@ class RoomTypeTable extends Component
     public function save()
     {
         $this->roomTypeForm->validate();
-        RoomType::create($this->roomTypeForm->pull());
+        $room_type = RoomType::create($this->roomTypeForm->pull());
+        $this->photosDisplay = [];
+        foreach ($this->photos as $photo) {
+            $cloundinaryImage = cloudinary()->upload($photo->getRealPath());
+            TypeRoomImage::create([
+                "room_type_id" => $room_type->id,
+                "url" => $cloundinaryImage->getSecurePath(),
+                "public_image_id" => $cloundinaryImage->getPublicId(),
+            ]);
+        }
         $this->isShowActionModal = false;
         $this->success("Create Successfully!", "The room type was created successfully", "toast-top toast-center");
 
@@ -98,9 +123,30 @@ class RoomTypeTable extends Component
 
         $typeRoom->save();
 
+        if (count($this->photos) > 0) {
+            $room_type_images = $typeRoom->TypeRoomImages;
+            foreach ($room_type_images as $room_type_image) {
+                Cloudinary::destroy($room_type_image->public_image_id);
+            }
+            foreach ($this->photos as $photo) {
+                $cloundinaryImage = cloudinary()->upload($photo->getRealPath());
+                TypeRoomImage::create([
+                    "room_type_id" => $typeRoom->id,
+                    "url" => $cloundinaryImage->getSecurePath(),
+                    "public_image_id" => $cloundinaryImage->getPublicId(),
+                ]);
+            }
+        }
+        $this->photosDisplay = [];
         $this->isShowActionModal = false;
 
         $this->success("Update Successfully!", "The room type was updated successfully", "toast-top toast-center");
+    }
+    public function updatedPhotos()
+    {
+        // Cập nhật trạng thái khi ảnh được tải lên
+        $this->photosDisplay = array_map(fn($photo) => $photo->temporaryUrl(), $this->photos);
+        $this->photosUploaded = true;
     }
     public function paginationView()
     {

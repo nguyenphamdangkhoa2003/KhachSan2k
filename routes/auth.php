@@ -3,16 +3,18 @@
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Middleware\admin;
+use App\Livewire\Admin\Component\CarouselTable;
 use App\Livewire\Pages\Admin\Component\CreateUser;
 use App\Livewire\Pages\Admin\Component\RoomTable;
 use App\Livewire\Pages\Admin\Component\RoomTypeTable;
 use App\Livewire\Pages\Admin\Component\UserTable;
 use App\Livewire\Pages\Admin\Dashboard;
+use App\Livewire\Pages\Auth\Register;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::middleware('guest')->group(function () {
-    Volt::route('register', 'pages.auth.register')
+    Volt::route('register', Register::class)
         ->name('register');
 
     Volt::route('login', 'pages.auth.login')
@@ -54,4 +56,5 @@ Route::middleware(['auth', admin::class])->group(function () {
     Volt::route("admin/dashboard/list-room", RoomTable::class)->name("admin.dashboard.room");
     Volt::route("admin/dashboard/list-user", UserTable::class)->name("admin.dashboard.user");
     Volt::route("admin/dashboard/user/create", CreateUser::class)->name("admin.dashboard.user.create");
+    Volt::route("admin/admin/dashboard/list-carousel", CarouselTable::class)->name("admin.dashboard.carousels");
 });

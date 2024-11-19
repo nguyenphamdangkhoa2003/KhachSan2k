@@ -26,7 +26,7 @@
         <div>
             <x-mary-toast />
             <x-mary-form wire:submit.prevent="save">
-                <x-mary-file wire:model="photo" label="Avatar">
+                <x-mary-file wire:model="userForm.avatar" label="Avatar">
                     <x-mary-avatar :image="$photo" class="!w-40 !rounded-lg" />
                 </x-mary-file>
                 <x-mary-input placeholder="Your name" icon="o-user" label="Name" wire:model="userForm.name" />

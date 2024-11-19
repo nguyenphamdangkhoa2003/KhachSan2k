@@ -29,37 +29,31 @@ class CreateUser extends Component
     }
     public function save()
     {
-        $this->validate();
-        $address = Address::create([
-            "province" => $this->province,
-            "district" => $this->district,
-            "ward" => $this->ward,
-        ]);
-        $user = User::create([
-            "name" => $this->userForm->name,
-            // "avatar" => null,
-            "email" => $this->userForm->email,
-            "phonenumber" => $this->userForm->phonenumber,
-            "dob" => $this->userForm->dob,
-            "password" => $this->userForm->password,
-            "address_id" => $address->id
-        ]);
-        $this->userForm->reset();
-        $this->success("Successfully", "Created a new user");
-        // try {
-        //     $this->userForm->validate();
-        //     DB::transaction(function () {
-        //         $address = Address::create([
-        //             "province" => $this->province,
-        //             "district" => $this->district,
-        //             "ward" => $this->ward,
-        //         ]);
 
-        //         User::create($this->userForm->pull());
-        //     });
-        //     $this->success("Successfully", "Created a new user");
-        // } catch (\Throwable $th) {
-        //     $this->error("Error", "Created user faild");
-        // }
+        try {
+            DB::transaction(function () {
+                $this->userForm->validate();
+                $address = Address::create([
+                    "province" => $this->province,
+                    "district" => $this->district,
+                    "ward" => $this->ward,
+                ]);
+                $cloundinaryImage = cloudinary()->upload($this->userForm->avatar->getRealPath());
+                $user = User::create([
+                    "name" => $this->userForm->name,
+                    "avatar" => $cloundinaryImage->getSecurePath(),
+                    "email" => $this->userForm->email,
+                    "phonenumber" => $this->userForm->phonenumber,
+                    "dob" => $this->userForm->dob,
+                    "password" => $this->userForm->password,
+                    "address_id" => $address->id
+                ]);
+                $this->userForm->reset();
+                $this->success("Successfully", "Created a new user");
+            });
+            $this->success("Successfully", "Created a new user");
+        } catch (\Throwable $th) {
+            $this->error("Error", "Created user faild");
+        }
     }
 }

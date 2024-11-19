@@ -13,17 +13,17 @@ class UserForm extends Form
     public $cpassword;
     public $phonenumber;
     public $dob;
-    public $address_id;
+    public $avatar;
     protected function rules()
     {
         return [
+            "avatar" => "required|max:1024",
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|lowercase',
             'password' => ['required', 'string', Password::defaults()],
             'cpassword' => 'required|same:password',
             'phonenumber' => 'required|numeric|digits_between:10,15',
             'dob' => 'required|date|before:today',
-            'address_id' => 'required|exists:addresses,id',
         ];
     }
     protected function messages()

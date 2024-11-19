@@ -76,14 +76,6 @@
                     wire:model="roomForm.status" />
                 <x-mary-textarea label="Description" wire:model="roomForm.description" placeholder="..."
                     hint="Max 1000 chars" rows="3" inline resize="false" />
-                <div wire:key="user-{{ Auth::user()->id }}">
-                    <x-mary-file wire:model.living="photos" label="Images" multiple class="mb-3" />
-                    @if ($isEditing)
-                        <x-mary-image-gallery :images="$photosDisplay" class="h-40 rounded-box" />
-                    @else
-                        <x-mary-image-gallery :images="array_map(fn($value) => $value->temporaryUrl(), $photos)" class="h-40 rounded-box" />
-                    @endif
-                </div>
                 <x-slot:actions>
                     <x-mary-button label="Cancel" @click="$wire.isShowActionModal = false" />
                     <x-mary-button icon-right="{{ $isEditing ? 'c-arrow-up' : 'o-plus' }}"

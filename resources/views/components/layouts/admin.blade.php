@@ -34,7 +34,7 @@
         <x-slot:sidebar drawer="main-drawer" collapsible class="bg-base-100 lg:bg-inherit">
 
             {{-- BRAND --}}
-            <div class="ml-5 pt-5">App</div>
+            <a href="{{ route('home') }}" class="ml-5 pt-5">App</a>
 
             {{-- MENU --}}
             <x-mary-menu activate-by-route>
@@ -51,12 +51,13 @@
 
                     <x-mary-menu-separator />
                 @endif
-
                 <x-mary-menu-item title="Type Room" icon="o-tag" link="{{ route('admin.dashboard.typeroom') }}" />
                 <x-mary-menu-item title="Room" icon="o-square-3-stack-3d"
                     link="{{ route('admin.dashboard.room') }}" />
-                <x-mary-menu-item title="User" icon="o-user"
-                    link="{{ route('admin.dashboard.user') }}"></x-mary-menu-item>
+                <x-mary-menu-item title="User" icon="o-user" link="{{ route('admin.dashboard.user') }}" />
+                <x-mary-menu-item title="Carousel" icon="o-square-2-stack"
+                    link="{{ route('admin.dashboard.carousels') }}" />
+                <x-mary-menu-item title="Log out" icon="o-power" link="{{ route('logout') }}" />
             </x-mary-menu>
         </x-slot:sidebar>
 

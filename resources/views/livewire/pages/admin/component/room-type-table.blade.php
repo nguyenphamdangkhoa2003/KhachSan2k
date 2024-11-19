@@ -9,7 +9,7 @@
         </x-slot:actions>
     </x-mary-header>
 
-    <x-mary-table :headers="$headers" :rows="$type_rooms" :sort-by="$sortBy" with-pagination striped >
+    <x-mary-table :headers="$headers" :rows="$type_rooms" :sort-by="$sortBy" with-pagination striped>
         @scope('cell_id', $type_rooms)
             <strong>{{ $type_rooms->id }}</strong>
         @endscope
@@ -55,6 +55,22 @@
             </div>
             <x-mary-textarea label="description" wire:model="roomTypeForm.description" placeholder="..."
                 hint="Max 1000 chars" rows="3" inline resize="false" />
+            <x-mary-file wire:model="photos" label="Images" multiple class="mb-3" />
+
+            <!-- Loading spinner -->
+            <div wire:key="user-{{ Auth::user()->id }}" class="hidden" wire:loading.class.remove="hidden"
+                wire:target="photos">
+                <p>Đang tải ảnh lên...</p>
+            </div>
+
+            <!-- Chỉ hiển thị ảnh sau khi tải lên -->
+            @if ($photosUploaded)
+                @if ($isEditing)
+                    <x-mary-image-gallery :images="$photosDisplay" class="h-40 rounded-box" />
+                @else
+                    <x-mary-image-gallery :images="array_map(fn($value) => $value->temporaryUrl(), $photos)" class="h-40 rounded-box" />
+                @endif
+            @endif
             <x-slot:actions>
                 <x-mary-button label="Cancel" />
                 <x-mary-button icon-right="{{ $isEditing ? 'c-arrow-up' : 'o-plus' }}"

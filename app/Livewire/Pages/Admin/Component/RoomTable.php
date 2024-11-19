@@ -32,10 +32,7 @@ class RoomTable extends Component
     public $search = "";
     public RoomForm $roomForm;
     public array $sortBy = ['column' => 'room_number', 'direction' => 'asc'];
-    #[Rule(['photos' => 'required'])]          // A separated rule to make it required
-    #[Rule(['photos.*' => 'image|max:1024'])]
-    public array $photos = [];
-    public array $photosDisplay = [];
+
     #[Layout("components.layouts.admin")]
     public function render()
     {
@@ -87,16 +84,13 @@ class RoomTable extends Component
     }
     public function delete()
     {
-        DB::transaction(function () {
-            $room = Room::find($this->id);
-            $room_images = $room->roomImage;
-            foreach ($room_images as $room_image) {
-                Cloudinary::destroy($room_image->public_image_id);
-            }
+        try {
             Room::destroy($this->id);
-        });
-        $this->isShowConfirmModal = false;
-        $this->success("Delete Successfully!", "The room type was deleted successfully", "toast-top toast-center");
+            $this->isShowConfirmModal = false;
+            $this->success("Delete Successfully!", "The room type was deleted successfully", "toast-top toast-center");
+        } catch (\Throwable $th) {
+            $this->error("Delete Fail!", "The room type was deleted fail", "toast-top toast-center");
+        }
     }
     public function save()
     {
@@ -106,16 +100,6 @@ class RoomTable extends Component
             DB::transaction(function () {
                 // Tạo bản ghi trong bảng `rooms` và lấy ID của phòng
                 $room = Room::create($this->roomForm->pull());
-
-                // Lưu ảnh vào Cloudinary và lưu các URL
-                foreach ($this->photos as $photo) {
-                    $cloundinaryImage = cloudinary()->upload($photo->getRealPath());
-                    RoomImage::create([
-                        "room_id" => $room->id,
-                        "url" => $cloundinaryImage->getSecurePath(),
-                        "public_image_id" => $cloundinaryImage->getPublicId(),
-                    ]);
-                }
             });
             $this->isShowActionModal = false;
             $this->success("Create Successfully!", "The room was created successfully", "toast-top toast-center");
@@ -136,20 +120,7 @@ class RoomTable extends Component
             $room->status = $this->roomForm->status;
             $room->room_type_id = $this->roomForm->room_type_id;
             $room->save();
-            if (count($this->photos) > 0) {
-                $room_images = $room->roomImage;
-                foreach ($room_images as $room_image) {
-                    Cloudinary::destroy($room_image->public_image_id);
-                }
-                foreach ($this->photos as $photo) {
-                    $cloundinaryImage = cloudinary()->upload($photo->getRealPath());
-                    RoomImage::create([
-                        "room_id" => $room->id,
-                        "url" => $cloundinaryImage->getSecurePath(),
-                        "public_image_id" => $cloundinaryImage->getPublicId(),
-                    ]);
-                }
-            }
+            
         });
 
         $this->isShowActionModal = false;
